@@ -1,9 +1,9 @@
-import { 
-  getAuth, 
+import {
+  getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
-  signInWithPopup, 
+  signInWithPopup,
   GoogleAuthProvider,
   PhoneAuthProvider,
   signInWithPhoneNumber,
@@ -12,31 +12,50 @@ import {
   setPersistence,
   browserLocalPersistence,
   signOut as firebaseSignOut,
-  onAuthStateChanged as firebaseAuthStateChanged
+  onAuthStateChanged as firebaseAuthStateChanged,
+  type Auth
 } from 'firebase/auth'
 import { app } from './firebase'
 
-const auth = getAuth(app)
-const googleProvider = new GoogleAuthProvider()
+// Lazy initialize auth only on client side
+let auth: Auth | null = null
+let googleProvider: GoogleAuthProvider | null = null
 
-// Set persistence to LOCAL (survives browser restart)
-setPersistence(auth, browserLocalPersistence)
-  .catch((error) => {
-    console.error("Error setting persistence:", error)
-  })
+const getAuthInstance = () => {
+  if (typeof window === 'undefined') {
+    throw new Error('Firebase Auth can only be used on the client side')
+  }
+  if (!auth) {
+    auth = getAuth(app)
+    googleProvider = new GoogleAuthProvider()
+    // Set persistence to LOCAL (survives browser restart)
+    setPersistence(auth, browserLocalPersistence)
+      .catch((error) => {
+        console.error("Error setting persistence:", error)
+      })
+  }
+  return auth
+}
+
+const getGoogleProvider = () => {
+  if (!googleProvider) {
+    getAuthInstance() // This will initialize both
+  }
+  return googleProvider!
+}
 
 // Email/Password Sign Up
 export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
   try {
-    const result = await createUserWithEmailAndPassword(auth, email, password)
-    
+    const result = await createUserWithEmailAndPassword(getAuthInstance(), email, password)
+
     // Update the user's display name
     if (result.user) {
       await updateProfile(result.user, {
         displayName: displayName
       })
     }
-    
+
     return { user: result.user, error: null }
   } catch (error: any) {
     return {
@@ -49,7 +68,7 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
 // Email/Password Sign In
 export const signIn = async (email: string, password: string) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password)
+    const userCredential = await signInWithEmailAndPassword(getAuthInstance(), email, password)
     return userCredential.user
   } catch (error: any) {
     throw new Error(error.message)
@@ -59,7 +78,7 @@ export const signIn = async (email: string, password: string) => {
 // Google Sign In
 export const signInWithGoogle = async () => {
   try {
-    const result = await signInWithPopup(auth, googleProvider)
+    const result = await signInWithPopup(getAuthInstance(), getGoogleProvider())
     return { user: result.user, error: null }
   } catch (error: any) {
     return {
@@ -74,10 +93,10 @@ let confirmationResultInstance: ConfirmationResult | null = null
 // Phone Number Sign In
 export const initializePhoneAuth = () => {
   if (!(window as any).recaptchaVerifier) {
-    (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+    (window as any).recaptchaVerifier = new RecaptchaVerifier(getAuthInstance(), 'recaptcha-container', {
       size: 'invisible',
-      callback: () => {},
-      'expired-callback': () => {}
+      callback: () => { },
+      'expired-callback': () => { }
     })
   }
   return (window as any).recaptchaVerifier
@@ -86,7 +105,7 @@ export const initializePhoneAuth = () => {
 export const signInWithPhone = async (phoneNumber: string) => {
   try {
     const recaptchaVerifier = initializePhoneAuth()
-    const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+    const result = await signInWithPhoneNumber(getAuthInstance(), phoneNumber, recaptchaVerifier)
     confirmationResultInstance = result
     return { confirmationResult: result, error: null }
   } catch (error: any) {
@@ -115,7 +134,7 @@ export const verifyPhoneCode = async (code: string) => {
 // Sign Out
 export const logOut = async () => {
   try {
-    await firebaseSignOut(auth)
+    await firebaseSignOut(getAuthInstance())
   } catch (error: any) {
     throw new Error(error.message)
   }
@@ -123,9 +142,9 @@ export const logOut = async () => {
 
 // Get Current User
 export const getCurrentUser = () => {
-  return auth.currentUser
+  return getAuthInstance().currentUser
 }
 
 // Auth State Observer
-export const onAuthStateChanged = (callback: Parameters<typeof firebaseAuthStateChanged>[1]) => 
-  firebaseAuthStateChanged(auth, callback) 
+export const onAuthStateChanged = (callback: Parameters<typeof firebaseAuthStateChanged>[1]) =>
+  firebaseAuthStateChanged(getAuthInstance(), callback) 
