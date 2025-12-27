@@ -11,8 +11,6 @@ import android.os.IBinder;
 import android.provider.Telephony;
 import android.util.Log;
 import androidx.core.app.NotificationCompat;
-import com.example.smartfianacetracker.utils.ServiceManager;
-import com.example.smartfianacetracker.utils.PreferenceManager;
 
 public class SmsService extends Service {
     private static final String TAG = "SmsService";
@@ -20,30 +18,21 @@ public class SmsService extends Service {
     private static final int NOTIFICATION_ID = 1;
 
     private SmsReceiver smsReceiver;
-    private ServiceManager serviceManager;
-    private PreferenceManager preferenceManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "SMS Service created");
 
-        serviceManager = ServiceManager.getInstance(this);
-        preferenceManager = new PreferenceManager(this);
-
-        if (!preferenceManager.isLoggedIn()) {
-            Log.e(TAG, "No user logged in, stopping service");
-            stopSelf();
-            return;
-        }
-
         createNotificationChannel();
         startForeground(NOTIFICATION_ID, createNotification());
 
-        smsReceiver = new SmsReceiver(serviceManager);
-        registerReceiver(smsReceiver, new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION));
+        // Register SMS receiver
+        smsReceiver = new SmsReceiver();
+        IntentFilter filter = new IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION);
+        registerReceiver(smsReceiver, filter);
 
-        serviceManager.updateServiceStatus("running");
+        Log.d(TAG, "SMS receiver registered successfully");
     }
 
     @Override
@@ -55,9 +44,17 @@ public class SmsService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // Unregister receiver
         if (smsReceiver != null) {
-            unregisterReceiver(smsReceiver);
+            try {
+                unregisterReceiver(smsReceiver);
+                Log.d(TAG, "SMS receiver unregistered");
+            } catch (Exception e) {
+                Log.e(TAG, "Error unregistering receiver", e);
+            }
         }
+
         Log.d(TAG, "SMS Service destroyed");
     }
 
@@ -68,13 +65,17 @@ public class SmsService extends Service {
 
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
+            NotificationChannel channel = new NotificationChannel(
                 CHANNEL_ID,
-                "SMS Service Channel",
+                "SMS Monitoring Service",
                 NotificationManager.IMPORTANCE_LOW
             );
+            channel.setDescription("Monitors SMS for financial transactions");
+
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(serviceChannel);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
         }
     }
 
@@ -82,7 +83,9 @@ public class SmsService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Smart FinBuddy")
             .setContentText("Monitoring SMS transactions")
-            .setSmallIcon(R.drawable.ic_finbuddy_logo)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setOngoing(true)
             .build();
     }
 }

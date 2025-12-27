@@ -8,7 +8,8 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -28,7 +29,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:paddingTop="24dp">
 
             <!-- Welcome Section -->
             <androidx.cardview.widget.CardView
@@ -385,120 +387,19 @@
                 </androidx.cardview.widget.CardView>
             </GridLayout>
 
-            <!-- About Section -->
-            <androidx.cardview.widget.CardView
+            <!-- Web Application Link -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/webAppButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="About Developer"
-                        android:textColor="@color/white"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="Hi, We are Team Deepship, a passionate  developers with expertise in modern web technologies. We created Smart FinBuddy to help people manage their finances more effectively using the power of AI and intuitive design."
-                        android:textColor="@color/text_secondary"
-                        android:lineSpacingExtra="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Contact Information"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="📧 Email: gondkaromkar53@gmail.com"
-                        android:textColor="@color/text_secondary"
-                        android:autoLink="email" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="📱 Contact: +91 8855916700"
-                        android:textColor="@color/text_secondary"
-                        android:autoLink="phone" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Connect With Me"
-                        android:textColor="@color/white"
-                        android:textStyle="bold" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/linkedinButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:text="LinkedIn Profile"
-                            android:textAllCaps="false"
-                            app:icon="@drawable/ic_linkedin"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/githubButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="GitHub"
-                            android:textAllCaps="false"
-                            app:icon="@drawable/ic_github"
-                            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-                    </LinearLayout>
-
-                    <!-- Web Application Link -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/webAppButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="🌐 Track on Web App"
-                        android:textAllCaps="false"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="@color/accent"
-                        app:cornerRadius="12dp"
-                        style="@style/Widget.MaterialComponents.Button" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:layout_gravity="center"
-                        android:text="© 2024 Smart FinBuddy. Built with ❤️ by Deepship"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                android:text="🌐 Track on Web App"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:backgroundTint="@color/accent"
+                app:cornerRadius="12dp"
+                style="@style/Widget.MaterialComponents.Button" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
