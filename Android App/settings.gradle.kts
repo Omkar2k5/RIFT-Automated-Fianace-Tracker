@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "New Satara Fianace Tracker"
+rootProject.name = "Smart FinBuddy"
 include(":app")
