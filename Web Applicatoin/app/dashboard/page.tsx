@@ -21,6 +21,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth"
 import { useRouter } from "next/navigation"
 import { subMonths, startOfMonth, endOfMonth } from "date-fns"
 import { logOut } from "@/lib/firebase-auth"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -320,6 +321,7 @@ export default function DashboardPage() {
               <LineChart className="h-5 w-5" />
               <span className="sr-only">Refresh</span>
             </Button>
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"
