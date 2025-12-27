@@ -112,7 +112,7 @@ export default function DashboardPage() {
   // Update data when user changes
   useEffect(() => {
     if (!user || !database) {
-      console.error('User or database not initialized')
+      // This is expected during initial render before auth is resolved
       return
     }
 
@@ -182,8 +182,8 @@ export default function DashboardPage() {
             ...Object.entries(creditData).map(([id, tx]) => ({ ...tx, type: 'credit' as const })),
             ...Object.entries(debitData).map(([id, tx]) => ({ ...tx, type: 'debit' as const }))
           ]
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, 5)
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, 5)
           setRecentTransactions(allTransactions)
 
         } catch (err) {

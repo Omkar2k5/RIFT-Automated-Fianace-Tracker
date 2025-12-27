@@ -4,14 +4,15 @@ import Link from "next/link"
 import { useEffect, useState, useCallback } from "react"
 import { IndianRupee, TrendingUp, ArrowUpRight, ArrowDownRight, RefreshCcw } from "lucide-react"
 import Image from "next/image"
-import { getDatabase, ref, get } from "firebase/database"
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { ref, get } from "firebase/database"
+import { onAuthStateChanged } from "firebase/auth"
 import { useRouter } from "next/navigation"
+import { database, auth } from "@/lib/firebase"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DashboardNav } from "@/components/dashboard-nav"
-import { BinanceCredentialsForm } from "@/components/binance-credentials-form"
+import { CoinDCXCredentialsForm } from "@/components/coindcx-credentials-form"
 
 interface CryptoAsset {
   symbol: string
@@ -36,100 +37,100 @@ export default function PortfolioPage() {
   const [lastUpdated, setLastUpdated] = useState<string>('')
   const [hasCredentials, setHasCredentials] = useState<boolean>(false)
 
-  // Check if user has Binance credentials
-const checkCredentials = useCallback(async (uid: string) => {
-  try {
-    const db = getDatabase()
-    const credentialsSnapshot = await get(ref(db, `users/${uid}/binance_credentials`))
-    setHasCredentials(credentialsSnapshot.exists())
-    return credentialsSnapshot.exists()
-  } catch (err) {
-    console.error('Error checking credentials:', err)
-    return false
-  }
-}, [])
+  // Check if user has CoinDCX credentials
+  const checkCredentials = useCallback(async (uid: string) => {
+    try {
+      if (!database) return false
+      const credentialsSnapshot = await get(ref(database, `users/${uid}/coindcx_credentials`))
+      setHasCredentials(credentialsSnapshot.exists())
+      return credentialsSnapshot.exists()
+    } catch (err) {
+      console.error('Error checking credentials:', err)
+      return false
+    }
+  }, [])
 
-const fetchPortfolio = useCallback(async () => {
-  try {
-    setIsLoading(true)
+  const fetchPortfolio = useCallback(async () => {
+    try {
+      setIsLoading(true)
 
-    const response = await fetch('/api/portfolio', {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': user?.uid || '', // Add user UID to headers
-      },
-      cache: 'no-store'
-    })
+      const response = await fetch('/api/portfolio', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Authorization': user?.uid || '', // Add user UID to headers
+        },
+        cache: 'no-store'
+      })
 
-    const data = await response.json()
+      const data = await response.json()
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        // Credentials not found, show form
-        setHasCredentials(false)
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Credentials not found, show form
+          setHasCredentials(false)
+          return
+        }
+        throw new Error(data.error || 'Failed to fetch portfolio data')
+      }
+
+      if (!data.balanceData || !data.marketData) {
+        throw new Error('Invalid data received from server')
+      }
+
+      const assets: CryptoAsset[] = data.balanceData
+        .filter((balance: any) => parseFloat(balance.balance) > 0)
+        .map((balance: any) => {
+          const market = data.marketData.find((m: any) =>
+            m.symbol === `${balance.currency}USDT` ||
+            m.symbol === `${balance.currency}BUSD`
+          )
+
+          const price = market ? parseFloat(market.last_price) : 0
+          const amount = parseFloat(balance.balance)
+          const value = amount * price
+
+          return {
+            symbol: balance.currency,
+            amount,
+            price,
+            value,
+            change24h: market?.change_24_hour || 0,
+            available_amount: parseFloat(balance.available_balance),
+            locked_amount: parseFloat(balance.locked_balance)
+          }
+        })
+        .sort((a: CryptoAsset, b: CryptoAsset) => b.value - a.value)
+
+      setPortfolio(assets)
+      setTotalValue(assets.reduce((sum, asset) => sum + asset.value, 0))
+      setError(null)
+      setHasCredentials(true)
+    } catch (err) {
+      console.error('Error fetching portfolio:', err)
+      setError(err instanceof Error ? err.message : 'Failed to load portfolio data')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [user?.uid])
+
+  useEffect(() => {
+    if (!auth) return
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        router.push('/login')
         return
       }
-      throw new Error(data.error || 'Failed to fetch portfolio data')
-    }
+      setUser(currentUser)
+      const hasApiKeys = await checkCredentials(currentUser.uid)
+      if (hasApiKeys) {
+        fetchPortfolio()
+      }
+      setIsLoading(false)
+    })
 
-    if (!data.balanceData || !data.marketData) {
-      throw new Error('Invalid data received from server')
-    }
-
-    const assets: CryptoAsset[] = data.balanceData
-      .filter((balance: any) => parseFloat(balance.balance) > 0)
-      .map((balance: any) => {
-        const market = data.marketData.find((m: any) =>
-          m.symbol === `${balance.currency}USDT` ||
-          m.symbol === `${balance.currency}BUSD`
-        )
-
-        const price = market ? parseFloat(market.last_price) : 0
-        const amount = parseFloat(balance.balance)
-        const value = amount * price
-
-        return {
-          symbol: balance.currency,
-          amount,
-          price,
-          value,
-          change24h: market?.change_24_hour || 0,
-          available_amount: parseFloat(balance.available_balance),
-          locked_amount: parseFloat(balance.locked_balance)
-        }
-      })
-      .sort((a: CryptoAsset, b: CryptoAsset) => b.value - a.value)
-
-    setPortfolio(assets)
-    setTotalValue(assets.reduce((sum, asset) => sum + asset.value, 0))
-    setError(null)
-    setHasCredentials(true)
-  } catch (err) {
-    console.error('Error fetching portfolio:', err)
-    setError(err instanceof Error ? err.message : 'Failed to load portfolio data')
-  } finally {
-    setIsLoading(false)
-  }
-}, [user?.uid])
-
-useEffect(() => {
-  const auth = getAuth()
-  const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-    if (!currentUser) {
-      router.push('/login')
-      return
-    }
-    setUser(currentUser)
-    const hasApiKeys = await checkCredentials(currentUser.uid)
-    if (hasApiKeys) {
-      fetchPortfolio()
-    }
-    setIsLoading(false)
-  })
-
-  return () => unsubscribe()
-}, [router, checkCredentials, fetchPortfolio])
+    return () => unsubscribe()
+  }, [router, checkCredentials, fetchPortfolio])
 
   useEffect(() => {
     const updateTimeString = () => {
@@ -196,11 +197,11 @@ useEffect(() => {
               <div className="flex flex-col gap-2">
                 <h1 className="text-2xl font-bold tracking-tight">Crypto Portfolio Setup</h1>
                 <p className="text-muted-foreground">
-                  Enter your Binance API credentials to get started
+                  Enter your CoinDCX API credentials to get started
                 </p>
               </div>
               <div className="w-full">
-                <BinanceCredentialsForm onSuccess={handleCredentialsSaved} />
+                <CoinDCXCredentialsForm onSuccess={handleCredentialsSaved} />
               </div>
             </div>
           </main>

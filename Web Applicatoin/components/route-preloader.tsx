@@ -7,7 +7,7 @@ interface RoutePreloaderProps {
   routes?: string[]
 }
 
-export function RoutePreloader({ routes = ['/dashboard', '/expenses', '/income', '/portfolio', '/fingpt'] }: RoutePreloaderProps) {
+export function RoutePreloader({ routes = ['/dashboard', '/expenses', '/income', '/portfolio'] }: RoutePreloaderProps) {
   const router = useRouter()
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export function RoutePreloader({ routes = ['/dashboard', '/expenses', '/income',
     const handleMouseEnter = (e: MouseEvent) => {
       const target = e.target as HTMLElement
       const link = target.closest('a')
-      
+
       if (link && link.href) {
         const url = new URL(link.href)
         if (url.origin === window.location.origin && routes.includes(url.pathname)) {
@@ -75,10 +75,10 @@ export function useIntelligentPreloading() {
 
     const preloadBasedOnBehavior = () => {
       const timeSpent = Date.now() - timeOnPage
-      
+
       // If user is engaged (mouse movements, scrolling, time spent), preload more routes
       if (mouseMovements > 10 || scrollDepth > 50 || timeSpent > 30000) {
-        const routesToPreload = ['/dashboard', '/expenses', '/income', '/portfolio', '/fingpt', '/budgeting', '/reports']
+        const routesToPreload = ['/dashboard', '/expenses', '/income', '/portfolio', '/budgeting', '/reports']
         routesToPreload.forEach(route => {
           router.prefetch(route)
         })

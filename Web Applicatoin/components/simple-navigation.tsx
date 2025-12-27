@@ -54,12 +54,6 @@ export default function SimpleNavigation() {
           >
             Dashboard
           </Link>
-          <Link
-            href="/fingpt"
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            FinGPT
-          </Link>
           <Button
             onClick={() => router.push('/login')}
             size="sm"
@@ -92,13 +86,6 @@ export default function SimpleNavigation() {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Dashboard
-          </Link>
-          <Link
-            href="/fingpt"
-            className="block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            FinGPT
           </Link>
           <Button
             onClick={() => {

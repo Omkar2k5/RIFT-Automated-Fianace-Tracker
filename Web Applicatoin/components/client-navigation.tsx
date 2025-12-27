@@ -136,12 +136,6 @@ export default function ClientNavigation() {
           >
             Dashboard
           </Link>
-          <Link
-            href={user ? "/fingpt" : "/login"}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            FinGPT
-          </Link>
           {isLoading ? (
             <div className="w-20 h-8 bg-gray-200 animate-pulse rounded" />
           ) : !user ? (
@@ -180,13 +174,6 @@ export default function ClientNavigation() {
             onClick={() => setIsMobileMenuOpen(false)}
           >
             Dashboard
-          </Link>
-          <Link
-            href={user ? "/fingpt" : "/login"}
-            className="block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-50"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            FinGPT
           </Link>
           {isLoading ? (
             <div className="w-full h-8 bg-gray-200 animate-pulse rounded" />
