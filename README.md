@@ -1,6 +1,7 @@
 # Fin AI - Finance Tracking Using AI 🤖💰
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://fin-ai-red.vercel.app/)
+[![Android APK](https://img.shields.io/badge/Android-APK-green)](https://github.com/Omkar2k5/RIFT-Automated-Fianace-Tracker/raw/main/Android%20APP.apk)
 [![Next.js](https://img.shields.io/badge/Next.js-15.3-black)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-18.2-blue)](https://reactjs.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-11.5-orange)](https://firebase.google.com/)
@@ -8,7 +9,9 @@
 
 > **Enterprise-Grade Financial Management Platform** - A modern, AI-powered financial tracking and budgeting solution built with cutting-edge technologies.
 
-🌐 **Live Application**: [https://fin-ai-red.vercel.app/](https://fin-ai-red.vercel.app/)
+🌐 **Live Web Application**: [https://fin-ai-red.vercel.app/](https://fin-ai-red.vercel.app/)
+
+📱 **Android App Download**: [Android APP.apk](./Android%20APP.apk) (617 KB) - Available in the root folder
 
 ---
 
@@ -297,8 +300,9 @@ RIFT/
 ### Android Application
 
 1. **Download the App**
-   - Download from [TeraBox](https://1024terabox.com/s/1GZTaEhB146Yg61iTKQEZag)
-   - Install the APK on your Android device
+   - **Option 1**: Download the APK from the root folder: [`Android APP.apk`](./Android%20APP.apk) (617 KB)
+   - **Option 2**: Download from [TeraBox](https://1024terabox.com/s/1GZTaEhB146Yg61iTKQEZag)
+   - Install the APK on your Android device (Enable "Install from Unknown Sources" if needed)
 
 2. **Features**
    - All web features available on mobile
